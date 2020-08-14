@@ -1,0 +1,47 @@
+ //모듈 불러오기
+ var express=require('express')
+ var csv= require('fast-csv')
+ var path=require('path')
+ var fs=require('fs')
+
+ //익스프레스 객체 생성
+ var app=express()
+
+ app.listen(8080)
+
+// 루트 경로(/) 파일을 내보낸다.
+app.get('/',function(request,response){
+	response.sendFile(path.join(__dirname+'/index2.html'))
+})
+app.get('/index2.html',function(request,response){
+	response.sendFile(path.join(__dirname+'/index2.html'))
+})
+app.use('/css',express.static(__dirname+'/css'))
+app.use('/fonts',express.static(__dirname+'/fonts'))
+app.use('/img',express.static(__dirname+'/img'))
+app.use('/js',express.static(__dirname+'/js'))
+
+//html로 요청받은 데이터를 넘겨준다. 
+app.get('/employee', function(req,res){
+	console.log('1')
+	res.send("제조업 근로자")
+})
+
+app.get('/Total', function(req,res){
+	console.log(testdata)
+	res.send(testdata[testdata_i])    //배열을 배열안에 넣어서 배열안의 값 하나씩 넣어주기
+	testdata_i = (testdata_i + 1) % testdata.length  // testdata배열을 하나씩 증가시키고 이를 길이 만큼 나눠서
+													// 배열이 끝나면 다시 0으로 돌아가기 (배열이 끝나면 데이터읽는것이 끝나지 않게)
+})
+var testdata= [] //testdata 배열 생성
+var testdata_i = 0
+var stream2 = fs.createReadStream('data.csv') //data.csv파일 일어 변수저장
+var csv_stream2 = csv.parse()
+                 .on('data', function(data){ //
+                 	testdata.push(data) //testdata보내기
+                 	console.log(data) //data 보여주기
+                 })
+                 .on('end', function(){ 
+                   console.log('usage stream: done')
+                 })
+stream2.pipe(csv_stream2)
